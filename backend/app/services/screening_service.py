@@ -1,0 +1,247 @@
+import json
+<<<<<<< HEAD
+from pathlib import Path
+=======
+>>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
+from typing import Any
+
+from sqlalchemy.orm import Session
+
+from app.ai.ai_service import AIService
+from app.models import (
+    Application,
+    CandidateFile,
+    Job,
+    ScreeningResult,
+)
+from app.parsers.pdf_parser import PDFParser
+<<<<<<< HEAD
+from app.parsers.docx_parser import DOCXParser
+=======
+>>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
+
+
+class ScreeningService:
+    """
+    Executes the complete AI screening workflow.
+
+    Workflow:
+        1. Load application
+        2. Load job
+        3. Load candidate CV
+        4. Extract resume text
+        5. Run AI screening
+        6. Save or update ScreeningResult
+    """
+
+    def __init__(self):
+        self.ai_service = AIService()
+        self.pdf_parser = PDFParser()
+<<<<<<< HEAD
+        self.docx_parser = DOCXParser()
+=======
+>>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
+
+    @staticmethod
+    def _to_dict(result: Any) -> dict:
+        """
+        Normalize AI response into a dictionary.
+        Supports:
+            - Pydantic v2 models
+            - Dictionaries
+            - JSON strings
+            - Generic objects
+        """
+        if result is None:
+            return {}
+
+        if isinstance(result, dict):
+            return result
+
+        if isinstance(result, str):
+            try:
+                return json.loads(result)
+            except Exception:
+                return {}
+
+        if hasattr(result, "model_dump"):
+            return result.model_dump()
+
+        if hasattr(result, "dict"):
+            return result.dict()
+
+        if hasattr(result, "__dict__"):
+            return vars(result)
+
+        return {}
+
+    @staticmethod
+    def _normalize_text(value: Any) -> str:
+        if value is None:
+            return ""
+
+        if isinstance(value, list):
+            return "\n".join(str(v) for v in value)
+
+        return str(value)
+
+    @staticmethod
+    def _normalize_score(value: Any) -> int:
+        try:
+            score = int(round(float(value)))
+            return max(0, min(100, score))
+        except Exception:
+            return 0
+
+    def run_screening(
+        self,
+        db: Session,
+        application_id: int,
+    ) -> ScreeningResult:
+<<<<<<< HEAD
+
+=======
+>>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
+        # --------------------------------------------------
+        # Load application
+        # --------------------------------------------------
+        application = (
+            db.query(Application)
+            .filter(Application.id == application_id)
+            .first()
+        )
+
+        if application is None:
+            raise ValueError("Application not found.")
+
+        # --------------------------------------------------
+        # Load job
+        # --------------------------------------------------
+        job = (
+            db.query(Job)
+            .filter(Job.id == application.job_id)
+            .first()
+        )
+
+        if job is None:
+            raise ValueError("Job not found.")
+
+        # --------------------------------------------------
+        # Load candidate CV
+        # --------------------------------------------------
+        candidate_file = (
+            db.query(CandidateFile)
+            .filter(CandidateFile.id == application.candidate_file_id)
+            .first()
+        )
+
+        if candidate_file is None:
+            raise ValueError("Candidate CV not found.")
+
+        # --------------------------------------------------
+<<<<<<< HEAD
+        # Extract resume text (PDF / DOCX)
+        # --------------------------------------------------
+        extension = Path(candidate_file.filepath).suffix.lower()
+
+        if extension == ".pdf":
+
+            resume_text = self.pdf_parser.extract_text(
+                candidate_file.filepath
+            )
+
+        elif extension == ".docx":
+
+            resume_text = self.docx_parser.extract_text(
+                candidate_file.filepath
+            )
+
+        else:
+
+            raise ValueError(
+                f"Unsupported resume format: {extension}"
+            )
+
+        if not resume_text.strip():
+            raise ValueError(
+                "Unable to extract text from the candidate CV."
+            )
+=======
+        # Extract resume text
+        # --------------------------------------------------
+        resume_text = self.pdf_parser.extract_text(candidate_file.filepath)
+
+        if not resume_text or not resume_text.strip():
+            raise ValueError("Unable to extract text from the candidate CV.")
+>>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
+
+        # --------------------------------------------------
+        # Run AI screening
+        # --------------------------------------------------
+        ai_result = self.ai_service.screen_candidate(
+            resume_text=resume_text,
+            job_description=job.description or "",
+        )
+
+        data = self._to_dict(ai_result)
+
+        # --------------------------------------------------
+        # Load existing screening result
+        # --------------------------------------------------
+        screening = (
+            db.query(ScreeningResult)
+            .filter(ScreeningResult.application_id == application.id)
+            .first()
+        )
+
+        if screening is None:
+            screening = ScreeningResult(
+                application_id=application.id,
+            )
+            db.add(screening)
+
+        # --------------------------------------------------
+        # Update fields
+        # --------------------------------------------------
+        screening.overall_score = self._normalize_score(
+            data.get("overall_score")
+        )
+        screening.technical_score = self._normalize_score(
+            data.get("technical_score")
+        )
+        screening.experience_score = self._normalize_score(
+            data.get("experience_score")
+        )
+        screening.education_score = self._normalize_score(
+            data.get("education_score")
+        )
+        screening.skills_score = self._normalize_score(
+            data.get("skills_score")
+        )
+
+        screening.recommendation = self._normalize_text(
+            data.get("recommendation")
+        )
+        screening.strengths = self._normalize_text(
+            data.get("strengths")
+        )
+        screening.weaknesses = self._normalize_text(
+            data.get("weaknesses")
+        )
+        screening.missing_skills = self._normalize_text(
+            data.get("missing_skills")
+        )
+        screening.reasoning = self._normalize_text(
+            data.get("reasoning")
+        )
+        screening.ai_model = self._normalize_text(
+            data.get("ai_model", self.ai_service.model)
+        )
+
+        # --------------------------------------------------
+        # Save
+        # --------------------------------------------------
+        db.commit()
+        db.refresh(screening)
+
+        return screening
