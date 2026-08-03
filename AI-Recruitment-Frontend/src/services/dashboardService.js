@@ -2,7 +2,8 @@ import api from "../api/api";
 
 async function getSummary() {
   try {
-    const response = await api.get("/dashboard/");
+    // Updated endpoint to match the backend
+    const response = await api.get("/dashboard/dashboard/");
     return response.data;
   } catch (error) {
     console.error("Failed to fetch dashboard summary", error);
@@ -27,10 +28,7 @@ async function getApplication(applicationId) {
     const response = await api.get(`/dashboard/applications/${applicationId}`);
     return response.data;
   } catch (error) {
-    console.error(
-      `Failed to fetch application ${applicationId}`,
-      error
-    );
+    console.error(`Failed to fetch application ${applicationId}`, error);
     throw error;
   }
 }
