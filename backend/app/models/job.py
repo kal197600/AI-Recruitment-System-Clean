@@ -3,7 +3,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
-    DateTime
+    DateTime,
 )
 
 from sqlalchemy.orm import relationship
@@ -72,14 +72,10 @@ class Job(Base):
         "Application",
         back_populates="job",
         cascade="all, delete-orphan"
-<<<<<<< HEAD
     )
 
     job_matches = relationship(
-    "JobMatch",
-    back_populates="job",
-    cascade="all, delete-orphan",
-)
-=======
+        "JobMatch",
+        back_populates="job",
+        cascade="all, delete-orphan"
     )
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
