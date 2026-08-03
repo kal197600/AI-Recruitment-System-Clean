@@ -4,13 +4,10 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 
-<<<<<<< HEAD
-=======
 # ==========================================================
 # Base
 # ==========================================================
 
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 class ApplicationBase(BaseModel):
     candidate_id: int
     job_id: int
@@ -20,12 +17,10 @@ class ApplicationBase(BaseModel):
     notes: Optional[str] = None
 
 
-<<<<<<< HEAD
 class ApplicationCreate(ApplicationBase):
     pass
 
 
-=======
 # ==========================================================
 # Create
 # ==========================================================
@@ -44,7 +39,6 @@ class ApplicationCreate(ApplicationBase):
 # Update
 # ==========================================================
 
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 class ApplicationUpdate(BaseModel):
     candidate_id: Optional[int] = None
     job_id: Optional[int] = None
@@ -55,13 +49,10 @@ class ApplicationUpdate(BaseModel):
     notes: Optional[str] = None
 
 
-<<<<<<< HEAD
-=======
 # ==========================================================
 # Response
 # ==========================================================
 
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 class ApplicationResponse(ApplicationBase):
     id: int
 

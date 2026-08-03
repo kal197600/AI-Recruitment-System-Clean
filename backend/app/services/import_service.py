@@ -1,8 +1,5 @@
 from app.database.database import SessionLocal
-<<<<<<< HEAD
 from app.services.job_matching_service import JobMatchingService
-=======
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 
 from app.services.email_service import EmailService
 from app.services.storage_service import StorageService
@@ -12,9 +9,7 @@ from app.ai.cv_parser import CVParser
 
 from app.models import (
     CandidateFile,
-    Application,
     ImportedEmail,
-    Job,
 )
 
 
@@ -136,9 +131,6 @@ class ImportService:
 
     # ==========================================================
     # ATTACHMENT
-    # ==========================================================
-
-               # ==========================================================
     # ATTACHMENT
     # ==========================================================
 
@@ -188,34 +180,10 @@ class ImportService:
 
         db.add(candidate_file)
 
-<<<<<<< HEAD
         # Required so candidate_file.id exists before running job matching
         db.flush()
 
         matching_service = JobMatchingService(db)
         matching_service.run_matching(candidate.id)
-=======
-        # Required so candidate_file.id exists before creating Application
-        db.flush()
-
-        job = (
-            db.query(Job)
-            .filter(Job.status == "Open")
-            .order_by(Job.id.asc())
-            .first()
-        )
-
-        if job:
-            application = Application(
-                candidate_id=candidate.id,
-                candidate_file_id=candidate_file.id,
-                job_id=job.id,
-                source="Email",
-                status="Applied",
-            )
-
-            db.add(application)
-   
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 
 

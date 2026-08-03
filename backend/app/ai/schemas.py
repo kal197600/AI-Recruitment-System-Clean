@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 from typing import List
 
-=======
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 from pydantic import BaseModel, Field
 
 
@@ -40,12 +37,7 @@ class CandidateExtraction(BaseModel):
     location: str = ""
     linkedin: str = ""
 
-<<<<<<< HEAD
-    # Supports values like 2.5 or 7.8 years
     years_experience: float = 0.0
-=======
-    years_experience: int = 0
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 
     current_position: str = ""
     current_company: str = ""
@@ -61,19 +53,11 @@ class CandidateExtraction(BaseModel):
 
 
 class ScreeningResultAI(BaseModel):
-<<<<<<< HEAD
     overall_score: float = 0.0
     technical_score: float = 0.0
     experience_score: float = 0.0
     education_score: float = 0.0
     skills_score: float = 0.0
-=======
-    overall_score: float = 0
-    technical_score: float = 0
-    experience_score: float = 0
-    education_score: float = 0
-    skills_score: float = 0
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 
     recommendation: str = ""
 
@@ -81,7 +65,6 @@ class ScreeningResultAI(BaseModel):
     weaknesses: list[str] = Field(default_factory=list)
     missing_skills: list[str] = Field(default_factory=list)
 
-<<<<<<< HEAD
     reasoning: str = ""
 
     ai_model: str = ""
@@ -113,6 +96,3 @@ class JobMatchAI(BaseModel):
 class JobMatchingResponse(BaseModel):
     best_job_id: int
     matches: List[JobMatchAI]
-=======
-    reasoning: str = ""
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656

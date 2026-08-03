@@ -1,9 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-<<<<<<< HEAD
 import traceback
-=======
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 
 from app.database import get_db
 from app.services.screening_service import ScreeningService
@@ -58,7 +55,6 @@ def run_screening(
         )
 
     except Exception as exc:
-<<<<<<< HEAD
         print("\n" + "=" * 80)
         print("AI SCREENING ERROR")
         print("=" * 80)
@@ -67,10 +63,7 @@ def run_screening(
         print(f"Exception message: {exc}")
         print("=" * 80 + "\n")
 
-        raise
-=======
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(exc),
         )
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656

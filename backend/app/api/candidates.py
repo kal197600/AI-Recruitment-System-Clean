@@ -32,7 +32,6 @@ def get_db():
     status_code=status.HTTP_200_OK,
 )
 def get_candidates(db: Session = Depends(get_db)):
-<<<<<<< HEAD
     candidates = db.query(Candidate).order_by(Candidate.id.desc()).all()
 
     response_items: List[CandidateResponse] = []
@@ -90,9 +89,6 @@ def get_candidates(db: Session = Depends(get_db)):
         )
 
     return response_items
-=======
-    return db.query(Candidate).order_by(Candidate.id.desc()).all()
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 
 
 @router.get(

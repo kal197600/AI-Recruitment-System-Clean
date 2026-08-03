@@ -7,18 +7,12 @@ from app.ai.llm import ask_llm
 from app.ai.prompts import (
     CV_EXTRACTION_PROMPT,
     SCREENING_PROMPT,
-<<<<<<< HEAD
     JOB_MATCHING_PROMPT,
-=======
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 )
 from app.ai.schemas import (
     CandidateExtraction,
     ScreeningResultAI,
-<<<<<<< HEAD
     JobMatchingResponse,
-=======
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 )
 
 load_dotenv()
@@ -29,10 +23,7 @@ class AIService:
     Central AI service for:
       - Resume parsing
       - Candidate screening
-<<<<<<< HEAD
       - Job matching
-=======
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 
     All LLM communication is delegated to app.ai.llm.ask_llm().
     """
@@ -77,10 +68,6 @@ class AIService:
         self,
         resume_text: str,
     ) -> CandidateExtraction:
-<<<<<<< HEAD
-
-=======
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
         prompt = f"""{CV_EXTRACTION_PROMPT}
 
 ==============================
@@ -97,31 +84,7 @@ Return ONLY valid JSON.
             model=self.model,
         )
 
-<<<<<<< HEAD
-        # ==================================================
-        # DEBUG - Print raw LLM response
-        # ==================================================
-        print("\n" + "=" * 80)
-        print("RAW LLM RESPONSE")
-        print("=" * 80)
-        print(response)
-        print("=" * 80 + "\n")
-
         data = self._extract_json(response)
-
-        # ==================================================
-        # DEBUG - Print parsed JSON
-        # ==================================================
-        print("\n" + "=" * 80)
-        print("PARSED JSON")
-        print("=" * 80)
-        print(json.dumps(data, indent=2, ensure_ascii=False))
-        print("=" * 80 + "\n")
-
-=======
-        data = self._extract_json(response)
-
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
         return CandidateExtraction.model_validate(data)
 
     # ==================================================
@@ -133,10 +96,6 @@ Return ONLY valid JSON.
         resume_text: str,
         job_description: str,
     ) -> ScreeningResultAI:
-<<<<<<< HEAD
-
-=======
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
         prompt = f"""{SCREENING_PROMPT}
 
 ==============================
@@ -176,7 +135,6 @@ ai_model
         if "ai_model" not in data or not data["ai_model"]:
             data["ai_model"] = self.model
 
-<<<<<<< HEAD
         return ScreeningResultAI.model_validate(data)
 
     # ==================================================
@@ -235,6 +193,3 @@ Return ONLY valid JSON.
         print("=" * 80 + "\n")
 
         return JobMatchingResponse.model_validate(data)
-=======
-        return ScreeningResultAI.model_validate(data)
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656

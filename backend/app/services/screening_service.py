@@ -1,8 +1,5 @@
 import json
-<<<<<<< HEAD
 from pathlib import Path
-=======
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 from typing import Any
 
 from sqlalchemy.orm import Session
@@ -15,10 +12,7 @@ from app.models import (
     ScreeningResult,
 )
 from app.parsers.pdf_parser import PDFParser
-<<<<<<< HEAD
 from app.parsers.docx_parser import DOCXParser
-=======
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 
 
 class ScreeningService:
@@ -37,10 +31,7 @@ class ScreeningService:
     def __init__(self):
         self.ai_service = AIService()
         self.pdf_parser = PDFParser()
-<<<<<<< HEAD
         self.docx_parser = DOCXParser()
-=======
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 
     @staticmethod
     def _to_dict(result: Any) -> dict:
@@ -98,10 +89,6 @@ class ScreeningService:
         db: Session,
         application_id: int,
     ) -> ScreeningResult:
-<<<<<<< HEAD
-
-=======
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
         # --------------------------------------------------
         # Load application
         # --------------------------------------------------
@@ -139,7 +126,6 @@ class ScreeningService:
             raise ValueError("Candidate CV not found.")
 
         # --------------------------------------------------
-<<<<<<< HEAD
         # Extract resume text (PDF / DOCX)
         # --------------------------------------------------
         extension = Path(candidate_file.filepath).suffix.lower()
@@ -166,14 +152,6 @@ class ScreeningService:
             raise ValueError(
                 "Unable to extract text from the candidate CV."
             )
-=======
-        # Extract resume text
-        # --------------------------------------------------
-        resume_text = self.pdf_parser.extract_text(candidate_file.filepath)
-
-        if not resume_text or not resume_text.strip():
-            raise ValueError("Unable to extract text from the candidate CV.")
->>>>>>> 46b0b8b4acb55ba4a177d552c2430212c1390656
 
         # --------------------------------------------------
         # Run AI screening
