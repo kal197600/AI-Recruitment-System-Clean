@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api.candidate_files import router as candidate_file_router
 from app.api.candidates import router as candidate_router
+from app.api.admin import router as admin_router
 from app.api.dashboard import router as dashboard_router
 from app.api.import_email import router as import_router
 from app.api.job_matching import router as job_matching_router
@@ -77,6 +78,7 @@ app.add_middleware(
 )
 
 app.include_router(candidate_router)
+app.include_router(admin_router)
 app.include_router(job_router)
 app.include_router(application_router)
 app.include_router(import_router)
