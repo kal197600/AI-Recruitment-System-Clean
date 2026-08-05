@@ -1,4 +1,5 @@
 from app.database.database import SessionLocal
+import traceback
 from app.services.job_matching_service import JobMatchingService
 
 from app.services.email_service import EmailService
@@ -141,51 +142,67 @@ class ImportService:
         email_info,
         attachment,
     ):
+        try:
+            print(f"Processing attachment: {attachment['filename']}")
 
-        print(f"Processing attachment: {attachment['filename']}")
+            print("STEP 1 - Saving attachment")
 
-        print("STEP 1 - Saving attachment")
+            storage = self.storage_service.save_attachment(
+                attachment
+            )
 
-        storage = self.storage_service.save_attachment(
-            attachment
-        )
+            print("STEP 2 - Attachment saved")
 
-        print("STEP 2 - Attachment saved")
+            print("STEP 3 - Parsing CV")
 
-        print("STEP 3 - Parsing CV")
+            candidate_data = self.cv_parser.parse(
+                storage["filepath"]
+            )
 
-        candidate_data = self.cv_parser.parse(
-            storage["filepath"]
-        )
+            print("STEP 4 - CV parsed")
 
-        print("STEP 4 - CV parsed")
+            print("STEP 5 - Saving candidate")
 
-        print("STEP 5 - Saving candidate")
+            candidate = candidate_service.save_ai_candidate(
+                candidate_data
+            )
 
-        candidate = candidate_service.save_ai_candidate(
-            candidate_data
-        )
+            print("STEP 6 - Candidate saved")
+            print(f"DEBUG - Candidate ID: {candidate.id}")
 
-        print("STEP 6 - Candidate saved")
+            candidate_file = CandidateFile(
+                candidate_id=candidate.id,
+                original_filename=storage["original_filename"],
+                stored_filename=storage["stored_filename"],
+                filepath=storage["filepath"],
+                file_type="CV",
+                mime_type=attachment.get("content_type"),
+                file_size=storage["size"],
+            )
 
-        candidate_file = CandidateFile(
-            candidate_id=candidate.id,
-            original_filename=storage["original_filename"],
-            stored_filename=storage["stored_filename"],
-            filepath=storage["filepath"],
-            file_type="CV",
-            mime_type=attachment.get("content_type"),
-            file_size=storage["size"],
-        )
+            print("DEBUG - CandidateFile object created")
 
-        db.add(candidate_file)
+            db.add(candidate_file)
 
-        # Persist the uploaded file record before job matching so later
-        # matching failures cannot roll it back.
-        db.commit()
-        db.refresh(candidate_file)
+            print("DEBUG - db.add(candidate_file) completed")
+            print("DEBUG - db.flush() is not used in the current process_attachment flow")
 
-        matching_service = JobMatchingService(db)
-        matching_service.run_matching(candidate.id)
+            # Persist the uploaded file record before job matching so later
+            # matching failures cannot roll it back.
+            db.commit()
+            print("DEBUG - db.commit() completed")
+
+            db.refresh(candidate_file)
+            print("DEBUG - db.refresh(candidate_file) completed")
+
+            print("DEBUG - Before JobMatchingService.run_matching()")
+            matching_service = JobMatchingService(db)
+            matching_service.run_matching(candidate.id)
+            print("DEBUG - After JobMatchingService.run_matching()")
+
+        except Exception as exc:
+            print(f"DEBUG - process_attachment exception: {exc}")
+            traceback.print_exc()
+            raise
 
 
