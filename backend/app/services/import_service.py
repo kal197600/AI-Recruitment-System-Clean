@@ -180,8 +180,10 @@ class ImportService:
 
         db.add(candidate_file)
 
-        # Required so candidate_file.id exists before running job matching
-        db.flush()
+        # Persist the uploaded file record before job matching so later
+        # matching failures cannot roll it back.
+        db.commit()
+        db.refresh(candidate_file)
 
         matching_service = JobMatchingService(db)
         matching_service.run_matching(candidate.id)
