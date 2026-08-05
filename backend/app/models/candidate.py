@@ -19,6 +19,7 @@ class Candidate(Base):
     id = Column(
         Integer,
         primary_key=True,
+        autoincrement=True,
         index=True
     )
 

@@ -19,7 +19,8 @@ class CandidateFile(Base):
 
     id = Column(
         Integer,
-        primary_key=True
+        primary_key=True,
+        autoincrement=True
     )
 
     candidate_id = Column(
