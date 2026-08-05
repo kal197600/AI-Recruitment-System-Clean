@@ -1,5 +1,5 @@
 import json
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import Any
 
 from sqlalchemy.orm import Session
@@ -128,18 +128,30 @@ class ScreeningService:
         # --------------------------------------------------
         # Extract resume text (PDF / DOCX)
         # --------------------------------------------------
-        extension = Path(candidate_file.filepath).suffix.lower()
+        raw_path = str(candidate_file.filepath or "").strip()
+        normalized_path = Path(PureWindowsPath(raw_path))
+
+        if not normalized_path.is_absolute():
+            base_dir = Path(__file__).resolve().parents[2]
+            normalized_path = base_dir / normalized_path
+
+        if not normalized_path.exists():
+            raise ValueError(
+                f"Candidate CV file not found: {normalized_path}"
+            )
+
+        extension = normalized_path.suffix.lower()
 
         if extension == ".pdf":
 
             resume_text = self.pdf_parser.extract_text(
-                candidate_file.filepath
+                str(normalized_path)
             )
 
         elif extension == ".docx":
 
             resume_text = self.docx_parser.extract_text(
-                candidate_file.filepath
+                str(normalized_path)
             )
 
         else:
