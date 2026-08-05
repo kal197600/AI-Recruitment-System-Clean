@@ -10,8 +10,10 @@ IMPORTANT RULES
 
 - Extract ONLY information explicitly found in the resume.
 - Never invent or guess information.
-- If a value is missing, return an empty string.
-- If a list has no items, return an empty list.
+- If a STRING field is missing, return "".
+- If a NUMERIC field is missing, return 0.
+- If a LIST field is missing, return [].
+- Never return an empty string for numeric fields.
 - Ignore headers, footers, page numbers and decorative elements.
 - Ignore cover letter text whenever possible.
 - Normalize dates and formatting when appropriate.
@@ -24,6 +26,9 @@ FIELDS TO EXTRACT
 4. location
 5. linkedin
 6. years_experience
+    - Must always be a number.
+    - Return 0 if it cannot be determined.
+    - Never return "".
 7. current_position
 8. current_company
 9. original_summary
@@ -38,6 +43,26 @@ For education items, include: degree, institution, field, start_date, end_date.
 For work_experience items, include: position, company, start_date, end_date, description.
 For language items, include: language, level.
 For certification items, include: certificate, issuer, issue_date.
+
+Example JSON output:
+
+{
+    "full_name": "",
+    "email": "",
+    "phone": "",
+    "location": "",
+    "linkedin": "",
+    "years_experience": 0,
+    "current_position": "",
+    "current_company": "",
+    "original_summary": "",
+    "ai_summary": "",
+    "skills": [],
+    "education": [],
+    "work_experience": [],
+    "languages": [],
+    "certifications": []
+}
 
 Return ONLY data matching the CandidateExtraction schema.
 """
