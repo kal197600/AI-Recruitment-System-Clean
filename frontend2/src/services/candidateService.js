@@ -22,8 +22,28 @@ export async function getCandidate(id) {
  * Create candidate
  */
 export async function createCandidate(candidate) {
-  const response = await api.post(BASE_URL, candidate);
-  return response.data;
+  console.group("POST /candidates");
+  console.log("Request:", candidate);
+
+  try {
+    const response = await api.post(BASE_URL, candidate);
+
+    console.log("Status:", response.status);
+    console.log("Response:", response);
+    console.log("Response Data:", response.data);
+
+    console.groupEnd();
+
+    return response.data;
+  } catch (err) {
+    console.error("Axios Error:", err);
+    console.log("Status:", err.response?.status);
+    console.log("Response:", err.response?.data);
+
+    console.groupEnd();
+
+    throw err;
+  }
 }
 
 /**

@@ -520,6 +520,12 @@ export default function Candidates() {
 
   async function handleSave(candidate) {
     try {
+      console.group("Candidate Save");
+      console.log("Dialog Mode:", dialogMode);
+      console.log("Candidate Object:", candidate);
+      console.log("Candidate JSON:", JSON.stringify(candidate, null, 2));
+      console.groupEnd();
+
       if (dialogMode === "add") {
         await createCandidate(candidate);
       } else if (dialogMode === "edit") {
