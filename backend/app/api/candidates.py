@@ -40,6 +40,14 @@ def get_candidates(db: Session = Depends(get_db)):
     ScreeningResultModel = ApplicationModel.screening_results.property.mapper.class_
 
     for candidate in candidates:
+        latest_file = next(
+            (f for f in candidate.files if f.is_latest),
+            None,
+        )
+
+        filepath = latest_file.filepath if latest_file else None
+        original_filename = latest_file.original_filename if latest_file else None
+
         latest_application = (
             db.query(ApplicationModel)
             .filter(ApplicationModel.candidate_id == candidate.id)
@@ -85,6 +93,8 @@ def get_candidates(db: Session = Depends(get_db)):
                 overall_score=overall_score,
                 recommendation=recommendation,
                 screening_date=screening_date,
+                filepath=filepath,
+                original_filename=original_filename,
             )
         )
 
@@ -109,7 +119,64 @@ def get_candidate(candidate_id: int, db: Session = Depends(get_db)):
             detail="Candidate not found",
         )
 
-    return candidate
+    latest_file = next(
+        (f for f in candidate.files if f.is_latest),
+        None,
+    )
+
+    filepath = latest_file.filepath if latest_file else None
+    original_filename = latest_file.original_filename if latest_file else None
+
+    ApplicationModel = Candidate.applications.property.mapper.class_
+    ScreeningResultModel = ApplicationModel.screening_results.property.mapper.class_
+
+    latest_application = (
+        db.query(ApplicationModel)
+        .filter(ApplicationModel.candidate_id == candidate.id)
+        .order_by(ApplicationModel.applied_at.desc(), ApplicationModel.id.desc())
+        .first()
+    )
+
+    screening_result = None
+    if latest_application is not None:
+        screening_result = (
+            db.query(ScreeningResultModel)
+            .filter(ScreeningResultModel.application_id == latest_application.id)
+            .first()
+        )
+
+    if screening_result is not None:
+        screening_status = "Screened"
+        overall_score = screening_result.overall_score
+        recommendation = screening_result.recommendation
+        screening_date = screening_result.created_at
+    else:
+        screening_status = "Not Screened"
+        overall_score = None
+        recommendation = None
+        screening_date = None
+
+    return CandidateResponse(
+        id=candidate.id,
+        full_name=candidate.full_name,
+        email=candidate.email,
+        phone=candidate.phone,
+        location=candidate.location,
+        years_experience=candidate.years_experience,
+        current_position=candidate.current_position,
+        current_company=candidate.current_company,
+        original_summary=candidate.original_summary,
+        ai_summary=candidate.ai_summary,
+        linkedin=candidate.linkedin,
+        source=candidate.source,
+        ai_model=candidate.ai_model,
+        screening_status=screening_status,
+        overall_score=overall_score,
+        recommendation=recommendation,
+        screening_date=screening_date,
+        filepath=filepath,
+        original_filename=original_filename,
+    )
 
 
 @router.post(

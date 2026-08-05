@@ -1,8 +1,10 @@
 from contextlib import asynccontextmanager
 import os
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.candidate_files import router as candidate_file_router
 from app.api.candidates import router as candidate_router
@@ -84,6 +86,9 @@ app.include_router(candidate_file_router)
 app.include_router(job_matching_router)
 
 app.include_router(dashboard_router)
+
+uploads_dir = Path(__file__).resolve().parents[1] / "uploads"
+app.mount("/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
 
 
 @app.get("/")

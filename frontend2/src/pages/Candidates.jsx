@@ -427,13 +427,17 @@ export default function Candidates() {
   }
 
   function getResumeUrl(candidate) {
-    return (
+    const path =
       candidate?.resume_url ||
       candidate?.cv_url ||
       candidate?.file_url ||
-      candidate?.filepath ||
-      ""
-    );
+      candidate?.filepath;
+
+    if (!path) return "";
+
+    if (path.startsWith("http")) return path;
+
+    return `https://ai-recruitment-backend-uouq.onrender.com/${path}`;
   }
 
   function handleDownloadResume(candidate) {

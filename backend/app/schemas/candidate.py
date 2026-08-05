@@ -56,5 +56,7 @@ class CandidateResponse(CandidateBase):
     overall_score: float | None = None
     recommendation: str | None = None
     screening_date: datetime | None = None
+    filepath: str | None = None
+    original_filename: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
