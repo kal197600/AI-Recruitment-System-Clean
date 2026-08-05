@@ -83,11 +83,7 @@ app.include_router(reports_router)
 app.include_router(candidate_file_router)
 app.include_router(job_matching_router)
 
-app.include_router(
-    dashboard_router,
-    prefix="/dashboard",
-    tags=["Dashboard"],
-)
+app.include_router(dashboard_router)
 
 
 @app.get("/")
