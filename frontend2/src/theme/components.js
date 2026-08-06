@@ -140,10 +140,16 @@ const components = ({ palette, typography, shadows, shape, spacing, theme }) => 
 
     MuiOutlinedInput: {
       styleOverrides: {
-        root: {
-          height: spacing.form.fieldHeight,
+        root: ({ ownerState }) => ({
           borderRadius: shape.components.textField,
           transition,
+          ...(ownerState.multiline
+            ? {
+                alignItems: "flex-start",
+              }
+            : {
+                height: spacing.form.fieldHeight,
+              }),
 
           "& .MuiOutlinedInput-notchedOutline": {
             borderColor: palette.divider,
@@ -157,10 +163,16 @@ const components = ({ palette, typography, shadows, shape, spacing, theme }) => 
             borderColor: palette.primary.main,
             borderWidth: 2,
           },
-        },
+        }),
 
         input: {
           padding: "12px 14px",
+        },
+
+        inputMultiline: {
+          padding: "16px 14px",
+          lineHeight: 1.5,
+          boxSizing: "border-box",
         },
       },
     },
@@ -180,63 +192,6 @@ const components = ({ palette, typography, shadows, shape, spacing, theme }) => 
     MuiSelect: {
       defaultProps: {
         size: "medium",
-      },
-    },
-
-    MuiAutocomplete: {
-      styleOverrides: {
-        paper: {
-          borderRadius: shape.components.menu,
-          boxShadow: shadows.menu,
-        },
-      },
-
-    },
-        MuiChip: {
-      styleOverrides: {
-        root: {
-          borderRadius: shape.components.chip,
-          fontWeight: 600,
-          height: 30,
-        },
-      },
-    },
-
-    MuiDialog: {
-      styleOverrides: {
-        paper: {
-          borderRadius: shape.components.dialog,
-          padding: spacing.dialog.padding * spacing.base,
-          boxShadow: shadows.dialog,
-          margin: 16,
-          width: "calc(100% - 32px)",
-          maxHeight: "calc(100% - 32px)",
-        },
-      },
-    },
-
-    MuiDialogTitle: {
-      styleOverrides: {
-        root: {
-          fontWeight: 600,
-          paddingBottom: 0,
-        },
-      },
-    },
-
-    MuiDialogContent: {
-      styleOverrides: {
-        root: {
-          paddingTop: spacing.base * 2,
-        },
-      },
-    },
-
-    MuiDialogActions: {
-      styleOverrides: {
-        root: {
-          padding: spacing.base * 2,
-        },
       },
     },
 

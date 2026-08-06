@@ -7,11 +7,11 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Grid,
   Stack,
   TextField,
   MenuItem,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 
 const initialState = {
   title: "",
@@ -116,23 +116,21 @@ export default function JobDialog({
 
             <Grid size={{ xs: 12 }}>
             <TextField
-              fullWidth
               multiline
-              rows={4}
               label="Description"
-              name="description"
-              value={form.description}
-              onChange={handleChange}
+              rows={4}
+              fullWidth
             />
             </Grid>
 
             <Grid size={{ xs: 12 }}>
             <TextField
               fullWidth
-              multiline
-              rows={4}
               label="Required Skills"
               name="required_skills"
+              multiline
+              minRows={3}
+              maxRows={6}
               value={form.required_skills}
               onChange={handleChange}
             />
