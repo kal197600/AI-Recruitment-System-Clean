@@ -129,29 +129,37 @@ class ScreeningService:
         # Extract resume text (PDF / DOCX)
         # --------------------------------------------------
         raw_path = str(candidate_file.filepath or "").strip()
-        normalized_path = Path(PureWindowsPath(raw_path))
 
-        if not normalized_path.is_absolute():
-            base_dir = Path(__file__).resolve().parents[2]
-            normalized_path = base_dir / normalized_path
+        is_remote_path = raw_path.startswith(("http://", "https://"))
 
-        if not normalized_path.exists():
-            raise ValueError(
-                f"Candidate CV file not found: {normalized_path}"
-            )
+        if is_remote_path:
+            resolved_path = raw_path
+            extension = raw_path.lower()
+        else:
+            normalized_path = Path(PureWindowsPath(raw_path))
 
-        extension = normalized_path.suffix.lower()
+            if not normalized_path.is_absolute():
+                base_dir = Path(__file__).resolve().parents[2]
+                normalized_path = base_dir / normalized_path
 
-        if extension == ".pdf":
+            if not normalized_path.exists():
+                raise ValueError(
+                    f"Candidate CV file not found: {normalized_path}"
+                )
+
+            resolved_path = str(normalized_path)
+            extension = normalized_path.suffix.lower()
+
+        if extension.endswith(".pdf"):
 
             resume_text = self.pdf_parser.extract_text(
-                str(normalized_path)
+                resolved_path
             )
 
-        elif extension == ".docx":
+        elif extension.endswith(".docx"):
 
             resume_text = self.docx_parser.extract_text(
-                str(normalized_path)
+                resolved_path
             )
 
         else:
