@@ -12,6 +12,10 @@ class PDFParser:
 
     def extract_text(self, file_path):
 
+        print("===== NEW PDF PARSER LOADED =====")
+        print(f"File: {file_path}")
+        print(f"Remote: {self._is_remote_path(file_path)}")
+
         text = ""
 
         try:
