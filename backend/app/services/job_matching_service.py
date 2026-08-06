@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 from typing import Any
 
 from sqlalchemy import select
@@ -204,19 +203,13 @@ class JobMatchingService:
             )
             raise ValueError("Candidate file path not found")
 
-        path = Path(filepath)
+        suffix = str(filepath).lower()
 
-        if not path.exists():
-            logger.error("Candidate file not found: %s", filepath)
-            raise ValueError(f"Candidate file not found: {filepath}")
+        if suffix.endswith(".pdf"):
+            return self.pdf_parser.extract_text(filepath)
 
-        suffix = path.suffix.lower()
-
-        if suffix == ".pdf":
-            return self.pdf_parser.extract_text(path)
-
-        if suffix == ".docx":
-            return self.docx_parser.extract_text(path)
+        if suffix.endswith(".docx"):
+            return self.docx_parser.extract_text(filepath)
 
         logger.error("Unsupported resume format: %s", suffix)
         raise ValueError(f"Unsupported resume format: {suffix}")
