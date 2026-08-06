@@ -8,6 +8,7 @@ import {
   DialogActions,
   Button,
   Grid,
+  Stack,
   TextField,
   MenuItem,
 } from "@mui/material";
@@ -64,9 +65,10 @@ export default function JobDialog({
 
       <Divider />
 
-      <DialogContent dividers>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
+      <DialogContent dividers sx={{ p: { xs: 2, sm: 3 } }}>
+        <Stack spacing={3}>
+          <Grid container spacing={2.5}>
+            <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               fullWidth
               label="Job Title"
@@ -74,9 +76,9 @@ export default function JobDialog({
               value={form.title}
               onChange={handleChange}
             />
-          </Grid>
+            </Grid>
 
-          <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               fullWidth
               label="Department"
@@ -84,9 +86,9 @@ export default function JobDialog({
               value={form.department}
               onChange={handleChange}
             />
-          </Grid>
+            </Grid>
 
-          <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               fullWidth
               label="Location"
@@ -94,9 +96,9 @@ export default function JobDialog({
               value={form.location}
               onChange={handleChange}
             />
-          </Grid>
+            </Grid>
 
-          <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               fullWidth
               label="Employment Type"
@@ -110,33 +112,33 @@ export default function JobDialog({
               <MenuItem value="Contract">Contract</MenuItem>
               <MenuItem value="Internship">Internship</MenuItem>
             </TextField>
-          </Grid>
+            </Grid>
 
-          <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
             <TextField
               fullWidth
               multiline
-              rows={5}
+              rows={4}
               label="Description"
               name="description"
               value={form.description}
               onChange={handleChange}
             />
-          </Grid>
+            </Grid>
 
-          <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
             <TextField
               fullWidth
               multiline
-              rows={5}
+              rows={4}
               label="Required Skills"
               name="required_skills"
               value={form.required_skills}
               onChange={handleChange}
             />
-          </Grid>
+            </Grid>
 
-          <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               fullWidth
               type="number"
@@ -145,9 +147,9 @@ export default function JobDialog({
               value={form.minimum_experience}
               onChange={handleChange}
             />
-          </Grid>
+            </Grid>
 
-          <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               fullWidth
               select
@@ -160,8 +162,9 @@ export default function JobDialog({
               <MenuItem value="Closed">Closed</MenuItem>
               <MenuItem value="Draft">Draft</MenuItem>
             </TextField>
+            </Grid>
           </Grid>
-        </Grid>
+        </Stack>
       </DialogContent>
 
       <DialogActions>
