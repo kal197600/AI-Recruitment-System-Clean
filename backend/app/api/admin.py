@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -53,3 +54,31 @@ def resync_sequences(db: Session = Depends(get_db)):
     return {
         "success": True,
     }
+
+
+@router.post("/fix-job-matches-sequence")
+def fix_job_matches_sequence(db: Session = Depends(get_db)):
+    try:
+        db.execute(
+            text(
+                """
+                SELECT setval(
+                    pg_get_serial_sequence('job_matches', 'id'),
+                    COALESCE((SELECT MAX(id) FROM job_matches), 1),
+                    true
+                );
+                """
+            )
+        )
+        db.commit()
+
+        return {
+            "success": True,
+            "message": "Job matches sequence fixed.",
+        }
+    except SQLAlchemyError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fix job matches sequence: {exc}",
+        )
