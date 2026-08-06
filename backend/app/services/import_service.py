@@ -155,9 +155,22 @@ class ImportService:
 
             print("STEP 3 - Parsing CV")
 
+            print(f"Storage URL : {storage['filepath']}")
+
             candidate_data = self.cv_parser.parse(
                 storage["filepath"]
             )
+
+            print("=" * 80)
+            print("PARSED CANDIDATE")
+            print("=" * 80)
+
+            print(f"Name        : {candidate_data.full_name}")
+            print(f"Email       : {candidate_data.email}")
+            print(f"Phone       : {candidate_data.phone}")
+            print(f"Location    : {candidate_data.location}")
+
+            print("=" * 80)
 
             print("STEP 4 - CV parsed")
 

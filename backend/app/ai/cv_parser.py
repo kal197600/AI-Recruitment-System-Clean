@@ -28,6 +28,21 @@ class CVParser:
         if not resume_text.strip():
             raise Exception("No text extracted from resume.")
 
+        print("=" * 80)
+        print("CV PARSER DEBUG")
+        print("=" * 80)
+        print(f"Resume length: {len(resume_text)} characters")
+        print("First 5000 characters of extracted text:")
+        print("-" * 80)
+        print(resume_text[:5000])
+        print("-" * 80)
+
         candidate = self.ai_service.parse_resume(resume_text)
+
+        print("=" * 80)
+        print("AI PARSED RESULT")
+        print("=" * 80)
+        print(candidate)
+        print("=" * 80)
 
         return candidate
