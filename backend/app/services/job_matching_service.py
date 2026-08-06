@@ -36,112 +36,129 @@ class JobMatchingService:
     def run_matching(self, candidate_id: int) -> dict[str, Any]:
         logger.info("Starting job matching for candidate_id=%s", candidate_id)
 
-        candidate = self._load_candidate(candidate_id)
-        latest_file = self._load_latest_file(candidate_id)
-        resume_text = self._extract_resume_text(latest_file)
-        jobs = self._load_open_jobs()
+        try:
+            candidate = self._load_candidate(candidate_id)
+            logger.info("Candidate loaded")
 
-        if not jobs:
-            logger.info("No open jobs found for candidate_id=%s", candidate_id)
+            latest_file = self._load_latest_file(candidate_id)
+            logger.info("Candidate file loaded")
+
+            resume_text = self._extract_resume_text(latest_file)
+            logger.info("Resume extracted")
+
+            jobs = self._load_open_jobs()
+            logger.info("Jobs loaded")
+
+            if not jobs:
+                logger.info("No open jobs found for candidate_id=%s", candidate_id)
+                return {
+                    "candidate": candidate,
+                    "best_job_id": None,
+                    "matches": [],
+                }
+
+            job_payload = [
+                {
+                    "job_id": job.id,
+                    "title": job.title,
+                    "description": job.description or "",
+                }
+                for job in jobs
+            ]
+
+            logger.info("Calling AI match_candidate_to_jobs()")
+            logger.info(
+                "Calling AI job matching for candidate_id=%s against %s open jobs",
+                candidate_id,
+                len(job_payload),
+            )
+
+            result = self.ai_service.match_candidate_to_jobs(
+                resume_text=resume_text,
+                jobs=job_payload,
+            )
+            logger.info("AI matching completed")
+
+            matches = getattr(result, "matches", [])
+            best_job_id = getattr(result, "best_job_id", None)
+
+            logger.info("Saving matches")
+            self._save_matches(candidate.id, matches)
+
+            overall_score = 0.0
+            if best_job_id is not None:
+                matched_item = next(
+                    (
+                        item
+                        for item in matches
+                        if self._get_value(item, "job_id") == best_job_id
+                    ),
+                    None,
+                )
+                overall_score = self._to_float(matched_item, "overall_score")
+
+            if best_job_id is None or overall_score < self.MIN_MATCH_SCORE:
+                application = None
+                screening = None
+                message = f"No suitable job found. Highest match score was {overall_score:.1f}%."
+                logger.info(
+                    "No suitable job found for candidate %s. Highest score: %.1f%%",
+                    candidate_id,
+                    overall_score,
+                )
+                best_job_id = None
+                matched = False
+            else:
+                application_service = ApplicationService()
+                logger.info("Creating application")
+                application_result = application_service.create_from_best_match(
+                    db=self.db,
+                    candidate_id=candidate.id,
+                    best_job_id=best_job_id,
+                )
+
+                application = application_result["application"]
+                screening = application_result["screening"]
+                logger.info("Application created")
+
+                latest_application = (
+                    self.db.query(Application)
+                    .filter(Application.candidate_id == candidate.id)
+                    .order_by(Application.applied_at.desc())
+                    .first()
+                )
+
+                if latest_application is not None:
+                    latest_application.job_id = best_job_id
+                    self.db.commit()
+                    self.db.refresh(latest_application)
+                    logger.info(
+                        "Updated latest application %s to matched job %s",
+                        latest_application.id,
+                        best_job_id,
+                    )
+                matched = True
+                message = "Candidate matched successfully."
+
+            logger.info(
+                "Finished job matching for candidate_id=%s best_job_id=%s",
+                candidate_id,
+                best_job_id,
+            )
+            logger.info("Matching finished successfully")
+
             return {
                 "candidate": candidate,
-                "best_job_id": None,
-                "matches": [],
+                "best_job_id": best_job_id,
+                "matches": matches,
+                "application": application,
+                "screening": screening,
+                "matched": matched,
+                "message": message,
             }
-
-        job_payload = [
-            {
-                "job_id": job.id,
-                "title": job.title,
-                "description": job.description or "",
-            }
-            for job in jobs
-        ]
-
-        logger.info(
-            "Calling AI job matching for candidate_id=%s against %s open jobs",
-            candidate_id,
-            len(job_payload),
-        )
-
-        result = self.ai_service.match_candidate_to_jobs(
-            resume_text=resume_text,
-            jobs=job_payload,
-        )
-
-        matches = getattr(result, "matches", [])
-        best_job_id = getattr(result, "best_job_id", None)
-
-        self._save_matches(candidate.id, matches)
-
-        overall_score = 0.0
-        if best_job_id is not None:
-            matched_item = next(
-                (
-                    item
-                    for item in matches
-                    if self._get_value(item, "job_id") == best_job_id
-                ),
-                None,
-            )
-            overall_score = self._to_float(matched_item, "overall_score")
-
-        if best_job_id is None or overall_score < self.MIN_MATCH_SCORE:
-            application = None
-            screening = None
-            message = f"No suitable job found. Highest match score was {overall_score:.1f}%."
-            logger.info(
-                "No suitable job found for candidate %s. Highest score: %.1f%%",
-                candidate_id,
-                overall_score,
-            )
-            best_job_id = None
-            matched = False
-        else:
-            application_service = ApplicationService()
-            application_result = application_service.create_from_best_match(
-                db=self.db,
-                candidate_id=candidate.id,
-                best_job_id=best_job_id,
-            )
-
-            application = application_result["application"]
-            screening = application_result["screening"]
-
-            latest_application = (
-                self.db.query(Application)
-                .filter(Application.candidate_id == candidate.id)
-                .order_by(Application.applied_at.desc())
-                .first()
-            )
-
-            if latest_application is not None:
-                latest_application.job_id = best_job_id
-                self.db.commit()
-                self.db.refresh(latest_application)
-                logger.info(
-                    "Updated latest application %s to matched job %s",
-                    latest_application.id,
-                    best_job_id,
-                )
-            matched = True
-            message = "Candidate matched successfully."
-
-        logger.info(
-            "Finished job matching for candidate_id=%s best_job_id=%s",
-            candidate_id,
-            best_job_id,
-        )
-
-        return {
-            "candidate": candidate,
-            "best_job_id": best_job_id,
-            "matches": matches,
-            "application": application,
-            "screening": screening,
-            "matched": matched,
-            "message": message,
-        }
+        except Exception:
+            logger.exception("JobMatchingService failed")
+            raise
 
     # ------------------------------------------------------------------
     # Database
