@@ -56,29 +56,58 @@ def resync_sequences(db: Session = Depends(get_db)):
     }
 
 
-@router.post("/fix-job-matches-sequence")
-def fix_job_matches_sequence(db: Session = Depends(get_db)):
+@router.post("/fix-all-sequences")
+def fix_all_sequences(db: Session = Depends(get_db)):
     try:
-        db.execute(
-            text(
-                """
-                SELECT setval(
-                    pg_get_serial_sequence('job_matches', 'id'),
-                    COALESCE((SELECT MAX(id) FROM job_matches), 1),
-                    true
-                );
-                """
-            )
-        )
+        db.execute(text("""
+            SELECT setval(
+                pg_get_serial_sequence('applications','id'),
+                COALESCE((SELECT MAX(id) FROM applications),1),
+                true
+            );
+        """))
+
+        db.execute(text("""
+            SELECT setval(
+                pg_get_serial_sequence('job_matches','id'),
+                COALESCE((SELECT MAX(id) FROM job_matches),1),
+                true
+            );
+        """))
+
+        db.execute(text("""
+            SELECT setval(
+                pg_get_serial_sequence('candidates','id'),
+                COALESCE((SELECT MAX(id) FROM candidates),1),
+                true
+            );
+        """))
+
+        db.execute(text("""
+            SELECT setval(
+                pg_get_serial_sequence('candidate_files','id'),
+                COALESCE((SELECT MAX(id) FROM candidate_files),1),
+                true
+            );
+        """))
+
+        db.execute(text("""
+            SELECT setval(
+                pg_get_serial_sequence('screening_results','id'),
+                COALESCE((SELECT MAX(id) FROM screening_results),1),
+                true
+            );
+        """))
+
         db.commit()
 
         return {
             "success": True,
-            "message": "Job matches sequence fixed.",
+            "message": "All PostgreSQL sequences repaired.",
         }
     except SQLAlchemyError as exc:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fix job matches sequence: {exc}",
+            detail=f"Failed to repair PostgreSQL sequences: {exc}",
         )
