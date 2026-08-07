@@ -36,8 +36,12 @@ def start_scheduler() -> None:
     if scheduler.running:
         return
 
-    scheduler.start()
-    logger.info("Scheduler started.")
+    try:
+        scheduler.start()
+        print("Scheduler started.")
+    except Exception as e:
+        print(f"ERROR starting scheduler: {e}")
+        raise
 
 
 def shutdown_scheduler() -> None:
@@ -50,7 +54,7 @@ def shutdown_scheduler() -> None:
         return
 
     _scheduler.shutdown(wait=True)
-    logger.info("Scheduler stopped.")
+    print("Scheduler stopped.")
 
     _scheduler = None
 

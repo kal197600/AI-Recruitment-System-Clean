@@ -20,6 +20,7 @@ def initialize_scheduler() -> None:
     scheduler = get_scheduler()
 
     if scheduler.get_job(JOB_ID) is None:
+        print("Adding Scheduled Email Import job")
         scheduler.add_job(
             func=run_email_import,
             trigger=IntervalTrigger(minutes=1),
@@ -28,6 +29,8 @@ def initialize_scheduler() -> None:
             replace_existing=True,
         )
 
-        logger.info("Email import job registered.")
+        print("Email import job registered.")
 
+    print("Calling start_scheduler()")
     start_scheduler()
+    print("Returned from start_scheduler()")
