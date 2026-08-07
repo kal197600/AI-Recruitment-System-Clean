@@ -11,13 +11,19 @@ def run_email_import() -> None:
     """
     Scheduled job that imports unread emails.
     """
-    logger.info("Scheduled email import started.")
+    print("=== EMAIL IMPORT STARTED ===")
 
     try:
+        logger.info("Scheduled email import started.")
+
+        print("Calling email import service...")
         import_service = ImportService()
         import_service.process_unread_emails()
+        print("Email import service finished.")
 
         logger.info("Scheduled email import completed successfully.")
 
-    except Exception:
+    except Exception as e:
+        print(f"EMAIL IMPORT FAILED: {e}")
         logger.exception("Scheduled email import failed.")
+        raise
