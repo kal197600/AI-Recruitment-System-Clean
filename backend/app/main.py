@@ -55,7 +55,9 @@ async def lifespan(app: FastAPI):
     scheduler_enabled = _env_flag("ENABLE_SCHEDULER", default=True)
 
     if scheduler_enabled:
+        print(">>> BEFORE initialize_scheduler")
         initialize_scheduler()
+        print(">>> AFTER initialize_scheduler")
 
     yield
 
