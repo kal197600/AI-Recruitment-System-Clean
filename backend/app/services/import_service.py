@@ -42,17 +42,24 @@ class ImportService:
 
             candidate_service = CandidateService(db)
 
+            print("Starting email processing loop...")
+
             for email_id in unread_ids:
 
+                print(f"Processing email {email_id}")
+
                 try:
+                    print("Calling process_email()")
                     self.process_email(
                         db=db,
                         candidate_service=candidate_service,
                         email_id=email_id,
                     )
+                    print("Returned from process_email()")
 
                 except Exception as e:
                     db.rollback()
+                    print(f"process_email FAILED: {e}")
                     print(f"ERROR: {e}")
 
         finally:
