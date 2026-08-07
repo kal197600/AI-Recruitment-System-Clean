@@ -38,6 +38,8 @@ def start_scheduler() -> None:
 
     try:
         scheduler.start()
+        print("Running:", scheduler.running)
+        print("Jobs:", scheduler.get_jobs())
         print("Scheduler started.")
     except Exception as e:
         print(f"ERROR starting scheduler: {e}")

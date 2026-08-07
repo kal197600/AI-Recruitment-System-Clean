@@ -28,9 +28,13 @@ def initialize_scheduler() -> None:
             name="Scheduled Email Import",
             replace_existing=True,
         )
+        print("Jobs after add:", scheduler.get_jobs())
 
         print("Email import job registered.")
 
     print("Calling start_scheduler()")
     start_scheduler()
+    scheduler = get_scheduler()
+    print("Jobs after start:", scheduler.get_jobs())
+    print("Running after start:", scheduler.running)
     print("Returned from start_scheduler()")
