@@ -30,7 +30,6 @@ def initialize_scheduler() -> None:
         )
         job = scheduler.get_job(JOB_ID)
         print("Job:", job)
-        print("Next run:", job.next_run_time)
         print("Jobs after add:", scheduler.get_jobs())
 
         print("Email import job registered.")
@@ -38,7 +37,6 @@ def initialize_scheduler() -> None:
     print("Calling start_scheduler()")
     start_scheduler()
     job = scheduler.get_job(JOB_ID)
-    print("Next run after start:", job.next_run_time)
     scheduler = get_scheduler()
     print("Jobs after start:", scheduler.get_jobs())
     print("Running after start:", scheduler.running)
